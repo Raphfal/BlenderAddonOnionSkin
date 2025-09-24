@@ -16,7 +16,7 @@ class OnionSkin3d(bpy.types.Panel):
     bl_idname = "OnionSkinAddon"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_context = "objectmode"
+    bl_context = ""
     bl_label = "OnionSkin3d"
 
     def draw(self, context):
@@ -25,22 +25,40 @@ class OnionSkin3d(bpy.types.Panel):
         obj = context.object
 
         row = layout.row()
-        row.label(text="Hello world!", icon='WORLD_DATA')
-
+        row.label(text = 'Onion Skin addon')
         row = layout.row()
-        row.label(text="Active object is: " + obj.name)
+        row.label(text = 'Select the meshes you want to use for the onion skin')
         row = layout.row()
-        row.prop(obj, "name")
-
+        row.label(text="Active object is : " + obj.name)
         row = layout.row()
-        row.operator("mesh.primitive_cube_add")
+        row.operator(startButton.bl_idname)
 
+
+
+class startButton(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "object.simple_operator"
+    bl_label = "START ONION SKIN"
+
+    @classmethod
+    def poll(cls, context):
+        return context.active_object is not None
+
+    def execute(self, context):
+        copyAllData()
+        return {'FINISHED'}
+    
+
+def copyAllData():
+        return
 
 def register():
+    bpy.utils.register_class(startButton)
     bpy.utils.register_class(OnionSkin3d)
 
 
 def unregister():
+    bpy.utils.register_class(startButton)
     bpy.utils.unregister_class(OnionSkin3d)
 
 
