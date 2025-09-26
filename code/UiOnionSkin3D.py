@@ -10,7 +10,7 @@ bl_info = {
 
 
 import bpy
-
+meshes = []
 class OnionSkin3d(bpy.types.Panel):
     """Creates a Panel in the Object properties window"""
     bl_idname = "OnionSkinAddon"
@@ -19,7 +19,7 @@ class OnionSkin3d(bpy.types.Panel):
     bl_label = "OnionSkin3d"
     bl_category = 'Onion Skin 3D'
     
-    meshes = []
+    
 
     def draw(self, context):
         layout = self.layout
