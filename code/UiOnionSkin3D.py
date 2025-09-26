@@ -16,22 +16,33 @@ class OnionSkin3d(bpy.types.Panel):
     bl_idname = "OnionSkinAddon"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_context = ""
     bl_label = "OnionSkin3d"
+    bl_category = 'Onion Skin 3D'
+    
+    meshes = []
 
     def draw(self, context):
         layout = self.layout
-
+        
         obj = context.object
-
+        text = "Onion skin 3D"
+        
         row = layout.row()
         row.label(text = 'Onion Skin addon')
         row = layout.row()
-        row.label(text = 'Select the meshes you want to use for the onion skin')
+        row = layout.row()
+        row.label(text = 'Select the meshes ')
+        row = layout.row()
+        row.label(text = 'you want to use ')
+        row = layout.row()
+        row.label(text = 'for the onion skin')
+        row = layout.row()
         row = layout.row()
         row.label(text="Active object is : " + obj.name)
         row = layout.row()
         row.operator(startButton.bl_idname)
+        row = layout.row()
+        
 
 
 
@@ -50,7 +61,8 @@ class startButton(bpy.types.Operator):
     
 
 def copyAllData():
-        return
+        for mesh in bpy.context.selected_objects:
+            meshes.append(mesh)
 
 def register():
     bpy.utils.register_class(startButton)
