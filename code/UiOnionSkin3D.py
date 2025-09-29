@@ -10,17 +10,19 @@ bl_info = {
 
 
 import bpy
-meshes = []
-class OnionSkin3d(bpy.types.Panel):
+import tracemalloc
+
+tracemalloc.start()
+
+class OnionSkin3d_PT_startPanel(bpy.types.Panel):
     """Creates a Panel in the Object properties window"""
-    bl_idname = "OnionSkinAddon"
+    bl_idname = "OnionSkin3d_PT_startPanel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_label = "OnionSkin3d"
     bl_category = 'Onion Skin 3D'
+    meshes = [] 
     
-    
-
     def draw(self, context):
         layout = self.layout
         
@@ -40,15 +42,15 @@ class OnionSkin3d(bpy.types.Panel):
         row = layout.row()
         row.label(text="Active object is : " + obj.name)
         row = layout.row()
-        row.operator(startButton.bl_idname)
+        row.operator(startButton_OT_addMesh.bl_idname)
         row = layout.row()
         
 
 
 
-class startButton(bpy.types.Operator):
+class startButton_OT_addMesh(bpy.types.Operator):
     """Tooltip"""
-    bl_idname = "object.simple_operator"
+    bl_idname = "operator.startbutton_ot_addmesh"
     bl_label = "START ONION SKIN"
 
     @classmethod
@@ -60,18 +62,21 @@ class startButton(bpy.types.Operator):
         return {'FINISHED'}
     
 
-def copyAllData():
+async def copyAllData():
+    if(len(OnionSkin3d.meshes) != 0) :
         for mesh in bpy.context.selected_objects:
-            meshes.append(mesh)
-
+            OnionSkin3d.meshes.append(mesh)
+            print(mesh)
+            
+    
 def register():
-    bpy.utils.register_class(startButton)
-    bpy.utils.register_class(OnionSkin3d)
+    bpy.utils.register_class(startButton_OT_addMesh)
+    bpy.utils.register_class(OnionSkin3d_PT_startPanel)
 
 
 def unregister():
-    bpy.utils.register_class(startButton)
-    bpy.utils.unregister_class(OnionSkin3d)
+    bpy.utils.register_class(startButton_OT_addMesh)
+    bpy.utils.unregister_class(OnionSkin3d_PT_startPanel)
 
 
 if __name__ == "__main__":
