@@ -11,12 +11,13 @@ bl_info = {
 
 import bpy
 import tracemalloc
+import asyncio
 
 tracemalloc.start()
 
-class OnionSkin3d_PT_startPanel(bpy.types.Panel):
+class ONIONSKIN3D_PT_main(bpy.types.Panel):
     """Creates a Panel in the Object properties window"""
-    bl_idname = "OnionSkin3d_PT_startPanel"
+    bl_idname = "ONIONSKIN3D_PT_main"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_label = "OnionSkin3d"
@@ -58,25 +59,25 @@ class startButton_OT_addMesh(bpy.types.Operator):
         return context.active_object is not None
 
     def execute(self, context):
-        copyAllData()
+        asyncio.run(copyAllData())
         return {'FINISHED'}
     
 
 async def copyAllData():
-    if(len(OnionSkin3d.meshes) != 0) :
-        for mesh in bpy.context.selected_objects:
-            OnionSkin3d.meshes.append(mesh)
-            print(mesh)
-            
+    """if(len(ONIONSKIN3D_PT_main.meshes) != 0) :"""
+    for mesh in bpy.context.selected_objects:
+        ONIONSKIN3D_PT_main.meshes.append(mesh)
+        print(mesh)
+    return {'FINISHED'}
     
 def register():
     bpy.utils.register_class(startButton_OT_addMesh)
-    bpy.utils.register_class(OnionSkin3d_PT_startPanel)
+    bpy.utils.register_class(ONIONSKIN3D_PT_main)
 
 
 def unregister():
     bpy.utils.register_class(startButton_OT_addMesh)
-    bpy.utils.unregister_class(OnionSkin3d_PT_startPanel)
+    bpy.utils.unregister_class(ONIONSKIN3D_PT_main)
 
 
 if __name__ == "__main__":
