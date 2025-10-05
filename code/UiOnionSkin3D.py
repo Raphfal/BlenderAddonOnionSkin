@@ -23,13 +23,12 @@ class ONIONSKIN3D_PT_homeUi(bpy.types.Panel):
     bl_region_type = 'UI'
     bl_label = "OnionSkin3dHomeUi"
     bl_category = 'Onion Skin 3D'
-    meshes = [] 
+    meshes = []
     
     def draw(self, context):
         layout = self.layout
         obj = context.object
-        text = "Onion skin 3D"      
-         
+        text = "Onion skin 3D"
         row = layout.row()
         row.label(text = 'Onion Skin addon')
         row = layout.row()
@@ -50,45 +49,12 @@ class ONIONSKIN3D_PT_homeUi(bpy.types.Panel):
         row = layout.row()
         row.operator(startButton_OT_addMesh.bl_idname)
         row = layout.row()
+        row.operator(restartButton_OT_restart.bl_idname)
         
 
-class ONIONSKIN3D_PT_startedUi(bpy.types.Panel):
-    """Creates a Panel in the Object properties window"""
-    bl_idname = "ONIONSKIN3D_PT_startedUi"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_label = "OnionSkin3dInUseUi"
-    bl_category = 'Onion Skin 3D'
-    meshes = [] 
-    
-    def draw(self, context):
-        layout = self.layout
-        obj = context.object
-        text = "Onion skin 3D"      
-         
-        row = layout.row()
-        row.label(text = 'Onion Skin addon')
-        row = layout.row()
-        row = layout.row()
-        row.label(text = 'Select the meshes ')
-        row = layout.row()
-        row.label(text = 'you want to use ')
-        row = layout.row()
-        row.label(text = 'for the onion skin')
-        row = layout.row()
-        row = layout.row()
-        row.label(text="Selcted meshes are :" )
-        row = layout.row()
-        box = row.box();
-        for mesh in bpy.context.selected_objects:                
-                  row = box.row();
-                  row.label(text=mesh.name)
-        row = layout.row()
-        row.operator(startButton_OT_addMesh.bl_idname)
-        row = layout.row()
-
-
-
+      
+def getMeshesList():
+    return ONIONSKIN3D_PT_homeUi.meshes
 
 class startButton_OT_addMesh(bpy.types.Operator):
     """Tooltip"""
@@ -100,32 +66,48 @@ class startButton_OT_addMesh(bpy.types.Operator):
         return context.active_object is not None
 
     def execute(self, context):
-        asyncio.run(copyAllData())
+        (copyAllData())
         return {'FINISHED'}
 
-        
+class restartButton_OT_restart(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "operator.restartbutton_ot_restart"
+    bl_label = "CLEAR MESHES"
+
+    @classmethod
+    def poll(cls, context):
+        return context.active_object is not None
+
+    def execute(self, context):
+        (clearAllData())
+        return {'FINISHED'}
 
 
-async def copyAllData():
-    """if(len(ONIONSKIN3D_PT_homeUi.meshes) != 0) :"""
-    for mesh in bpy.context.selected_objects:
-        ONIONSKIN3D_PT_homeUi.meshes.append(mesh)
-        print(mesh)
+def copyAllData():
+    if(len(ONIONSKIN3D_PT_homeUi.meshes) == 0) :
+        for mesh in bpy.context.selected_objects:
+            getMeshesList().append(mesh)
+            print(mesh)
+    return {'FINISHED'}
+
+def clearAllData():
+    print(len(getMeshesList()))
+    getMeshesList().clear()
+    print(len(getMeshesList()))
     return {'FINISHED'}
     
-def register():
-    bpy.utils.register_class(startButton_OT_addMesh)
-    bpy.utils.register_class(ONIONSKIN3D_PT_homeUi)
+    
+classes = ( ONIONSKIN3D_PT_homeUi, startButton_OT_addMesh, restartButton_OT_restart)
 
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
 
 def unregister():
-    bpy.utils.register_class(startButton_OT_addMesh)
-    bpy.utils.unregister_class(ONIONSKIN3D_PT_homeUi)
-
-
+    for cls in classes:
+        bpy.utils.unregister_class(cls)
 
 
 if __name__ == "__main__":
     register()
-    
 
