@@ -51,6 +51,7 @@ class ONIONSKIN3D_PT_homeUi(bpy.types.Panel):
         row = layout.row()
         row.operator(restartButton_OT_restart.bl_idname)
         
+        
 class ONIONSKIN3D_PT_SettingPanel(bpy.types.Panel):
     """Creates a Panel in the Object properties window"""
     """It is the Panel were you tweek the settings of the onion skin"""
@@ -59,23 +60,25 @@ class ONIONSKIN3D_PT_SettingPanel(bpy.types.Panel):
     bl_region_type = 'UI'
     bl_label = "Setings"
     bl_category = 'Onion Skin 3D'
-    bpy.types.WindowManager.Interval = bpy.props.FloatProperty()
-    bpy.types.WindowManager.nbrBefore = bpy.props.IntProperty()
-    bpy.types.WindowManager.nbrAfter = bpy.props.IntProperty()
+    bpy.types.Scene.interval = bpy.props.FloatProperty( default = 0)
+    bpy.types.Scene.nbrFrmBefore = bpy.props.IntProperty(default = 0)
+    bpy.types.Scene.nbrFrmAfter = bpy.props.IntProperty(default = 0)
+    bpy.types.Scene.opacity = bpy.props.FloatProperty(default=0)
+    
     
     def draw(self, context):
         layout = self.layout
         obj = context.object
-        text = "Onion skin 3D"
-        layout.prop(bpy.types.WindowManager.Interval, "Interval")
-        layout.prop(bpy.types.WindowManager.nbrBefore, "nbrBefore")
-        layout.prop(bpy.types.WindowManager.nbrAfter, "nbrBefore")
+        text = "Settings for the Onion skin 3D"
+        layout = self.layout
+        layout.prop(context.scene, "interval")
+        layout.prop(context.scene, "nbrFrmBefore")
+        layout.prop(context.scene, "nbrFrmAfter")
+        layout.prop(context.scene, "opacity")
         
 
 
       
-def getMeshesList():
-    return ONIONSKIN3D_PT_homeUi.meshes
 
 class startButton_OT_addMesh(bpy.types.Operator):
     """Tooltip"""
@@ -105,6 +108,9 @@ class restartButton_OT_restart(bpy.types.Operator):
         return {'FINISHED'}
 
 
+
+
+
 def copyAllData():
     """Add mesh in meshes tab only if they aren't already in"""
     for mesh in bpy.context.selected_objects:
@@ -118,9 +124,24 @@ def clearAllData():
     getMeshesList().clear()
     print(len(getMeshesList()))
     return {'FINISHED'}
+
+def onionSkinMain():
+    for mesh in getMeshesList(): 
+        return 0
+        
+
+bpy.app.handlers.frame_change_post.append(onionSkinMain)
+
     
     
-classes = ( ONIONSKIN3D_PT_homeUi, startButton_OT_addMesh, restartButton_OT_restart, ONIONSKIN3D_PT_SettingPanel)
+classes = (
+    ONIONSKIN3D_PT_homeUi, 
+    startButton_OT_addMesh, 
+    restartButton_OT_restart, 
+    ONIONSKIN3D_PT_SettingPanel
+)
+
+
 
 def register():
     for cls in classes:
@@ -129,8 +150,10 @@ def register():
 def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
+    del bpy.types.Scene.interval
 
 
 if __name__ == "__main__":
+    
     register()
 
