@@ -11,7 +11,7 @@ bl_info = {
 
 import bpy
 import tracemalloc
-import asyncio
+
 
 tracemalloc.start()
 
@@ -60,7 +60,7 @@ class ONIONSKIN3D_PT_SettingPanel(bpy.types.Panel):
     bl_region_type = 'UI'
     bl_label = "Setings"
     bl_category = 'Onion Skin 3D'
-    bpy.types.Scene.interval = bpy.props.FloatProperty( default = 0)
+    bpy.types.Scene.interval = bpy.props.IntProperty( default = 0)
     bpy.types.Scene.nbrFrmBefore = bpy.props.IntProperty(default = 0)
     bpy.types.Scene.nbrFrmAfter = bpy.props.IntProperty(default = 0)
     bpy.types.Scene.opacity = bpy.props.FloatProperty(default=0)
@@ -108,8 +108,9 @@ class restartButton_OT_restart(bpy.types.Operator):
         return {'FINISHED'}
 
 
-
-
+def getMeshesList():
+    """Retourne la liste des meshes sélectionnés pour l'onion skin"""
+    return ONIONSKIN3D_PT_homeUi.meshes
 
 def copyAllData():
     """Add mesh in meshes tab only if they aren't already in"""
@@ -119,11 +120,16 @@ def copyAllData():
             print(mesh)
     return {'FINISHED'}
 
+
 def clearAllData():
+    """Vide la liste des meshes ET supprime tous les duplicatas"""
     print(len(getMeshesList()))
+    
+    # Vider la liste des meshes
     getMeshesList().clear()
     print(len(getMeshesList()))
     return {'FINISHED'}
+
 
 def onionSkinMain(scene):
     current_frame = bpy.context.scene.frame_current
@@ -131,12 +137,35 @@ def onionSkinMain(scene):
     nbr_before = bpy.context.scene.nbrFrmBefore
     nbr_after = bpy.context.scene.nbrFrmAfter
     
-    print(f"Frame: {current_frame}, Interval: {interval}, Before: {nbr_before}, After: {nbr_after}")
+    # Créer les nouveaux duplicatas
+    createOnionDuplicates(scene)
         
 
 bpy.app.handlers.frame_change_post.append(onionSkinMain)
 
+def createOnionDuplicates(scene):
+    """Crée les duplicatas d'onion skin pour chaque mesh"""
+    current_frame = bpy.context.scene.frame_current
+    interval = bpy.context.scene.interval
+    nbr_before = bpy.context.scene.nbrFrmBefore
+    nbr_after = bpy.context.scene.nbrFrmAfter
+    opacity = bpy.context.scene.opacity
     
+    frames_before = [current_frame - (i * interval) for i in range(1, nbr_before + 1)]
+    frames_after = [current_frame + (i * interval) for i in range(1, nbr_after + 1)]
+    all_frames = frames_before + frames_after
+    
+    for mesh in getMeshesList(): 
+        for frame in all_frames:
+            bpy.context.scene.frame_set(frame)
+            matrix = mesh.matrix_world.copy()
+            new_obj = mesh.copy()
+            new_obj.data = mesh.data.copy()
+            new_obj.name = "{}_onion_{}".format(mesh.name,frame)
+            bpy.context.collection.objects.link(new_obj)
+            print("Created duplicate: {}".format(new_obj.name))
+
+    bpy.context.scene.frame_set(current_frame)
     
 classes = (
     ONIONSKIN3D_PT_homeUi, 
@@ -155,7 +184,12 @@ def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
     del bpy.types.Scene.interval
-
+    del bpy.types.Scene.nbrFrmBefore
+    del bpy.types.Scene.nbrFrmAfter
+    del bpy.types.Scene.opacity
+    
+    if onionSkinMain in bpy.app.handlers.frame_change_post:
+        bpy.app.handlers.frame_change_post.remove(onionSkinMain)
 
 if __name__ == "__main__":
     
