@@ -125,9 +125,13 @@ def clearAllData():
     print(len(getMeshesList()))
     return {'FINISHED'}
 
-def onionSkinMain():
-    for mesh in getMeshesList(): 
-        return 0
+def onionSkinMain(scene):
+    current_frame = bpy.context.scene.frame_current
+    interval = bpy.context.scene.interval
+    nbr_before = bpy.context.scene.nbrFrmBefore
+    nbr_after = bpy.context.scene.nbrFrmAfter
+    
+    print(f"Frame: {current_frame}, Interval: {interval}, Before: {nbr_before}, After: {nbr_after}")
         
 
 bpy.app.handlers.frame_change_post.append(onionSkinMain)
